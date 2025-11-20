@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlayCircle, Clock } from "lucide-react";
+import type { Theme } from "@/types/question";
+import { THEME_OPTIONS } from "@/constants/themes"; // source unique des thèmes
 
 export const TestSetupPage: React.FC = () => {
   const navigate = useNavigate();
   const [questionsCount, setQuestionsCount] = useState(20);
   const [withTimer, setWithTimer] = useState(true);
+  const [theme, setTheme] = useState<Theme | "">("");
 
   return (
     <div className="space-y-3">
@@ -25,20 +28,23 @@ export const TestSetupPage: React.FC = () => {
         <div className="px-3 py-4 space-y-4 text-xs sm:text-sm">
           <div className="grid sm:grid-cols-3 gap-2">
             <div className="col-span-2 space-y-1">
-              <label className="text-[11px] font-medium text-slate-600">
-                Thème principal
-              </label>
-              <select className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs bg-white">
-                <option>Tous les thèmes</option>
-                <option>Concepts clés</option>
-                <option>Pratiques ITIL</option>
-                <option>Dimensions & SVS</option>
+              <label className="text-[11px] font-medium text-slate-600">Thème principal</label>
+              <select
+                className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs bg-white"
+                value={theme}
+                onChange={(e) => setTheme((e.target.value || "") as Theme | "")}
+              >
+                <option value="">Tous les thèmes</option>
+                {THEME_OPTIONS.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
               </select>
             </div>
+
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-slate-600">
-                Nombre de questions
-              </label>
+              <label className="text-[11px] font-medium text-slate-600">Nombre de questions</label>
               <select
                 className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs bg-white"
                 value={questionsCount}
@@ -63,14 +69,14 @@ export const TestSetupPage: React.FC = () => {
             </label>
             <div className="flex items-center gap-1 text-[11px] text-slate-500">
               <Clock className="w-3 h-3" />
-              Durée suggérée : 25 min
+              Durée suggérée : {questionsCount <= 20 ? "25 min" : "45–60 min"}
             </div>
           </div>
 
           <button
             onClick={() =>
               navigate("/test/run", {
-                state: { questionsCount, withTimer }
+                state: { questionsCount, withTimer, theme: theme || undefined },
               })
             }
             className="w-full mt-1 inline-flex items-center justify-center rounded-lg bg-indigo-600 text-white text-xs py-1.5 font-semibold hover:bg-indigo-700"
